@@ -62,58 +62,41 @@ void lostWifiCallback (const WiFiEventStationModeDisconnected& evt) {
 // Send RC commands to devices
 //
 void requestRcSwitch(uint8_t device_id, const char * device_name, bool state) {
-  Serial.print("Gerät: "); Serial.println(device_name);
+  Serial.print("Device: "); Serial.println(device_name);
   Serial.print("Status: ");
 
   if (state) {
 
     if(device_id == 0) {
-    Serial.println("AN");
+    Serial.println("ON");
 
-//    mySwitch.send(12152610, 24);
-    // Sending RC command to more than one device
-    mySwitch.switchOn("11111", "10000"); // Schalter A
+    // Sending RC command to more than one device at once
+    mySwitch.switchOn("11111", "10000"); // Socket A
     delay(50);
-    mySwitch.switchOn("11111", "01000"); // Schalter B
+    mySwitch.switchOn("11111", "01000"); // Socket B
     delay(50);
-    mySwitch.switchOn("11111", "00100"); // Schalter C
+    mySwitch.switchOn("11111", "00100"); // Socket C
     delay(50);
-    mySwitch.switchOn("11111", "00010"); // Schalter D
+    mySwitch.switchOn("11111", "00010"); // Socket D
     delay(50);
     }
-
-
-  //  if(device_id == 1) {
-  //  Serial.println("AN");
-
-  //  mySwitch.switchOn("11111", "00001");
-  //  delay(50);
-  //  }
-
   }
 
   else {
 
     if(device_id == 0) {
-    Serial.println("AUS");
+    Serial.println("OFF");
 
-    //mySwitch.send(11855607, 24);
-    mySwitch.switchOff("11111", "10000"); // Schalter A
+    mySwitch.switchOff("11111", "10000"); // Socket A
     delay(50);
-    mySwitch.switchOff("11111", "01000"); // Schalter B
+    mySwitch.switchOff("11111", "01000"); // Socket B
     delay(50);
-    mySwitch.switchOff("11111", "00100"); // Schalter C
+    mySwitch.switchOff("11111", "00100"); // Socket C
     delay(50);
-    mySwitch.switchOff("11111", "00010"); // Schalter D
+    mySwitch.switchOff("11111", "00010"); // Socket D
     delay(50);
     }
 
-//    if(device_id == 1) {
-//    Serial.println("OFF");
-
-//    mySwitch.switchOff("11111", "00001");
-//    delay(50);
-//    }
   ticker.attach(0.5, disableLed);
   }
 
@@ -123,7 +106,7 @@ void requestRcSwitch(uint8_t device_id, const char * device_name, bool state) {
 // Setup web server and RCSwitch
 //
 void setup() {
-  // put your setup code here, to run once:
+
   Serial.begin(115200);
   Serial.println("");
   Serial.println("ESP8266 IR Controller");
@@ -165,13 +148,13 @@ void setup() {
 
   // below RC specific
 
-  mySwitch.enableTransmit(5);  //D1 am NodeMCU
+  mySwitch.enableTransmit(5);  //D1 on NodeMCU (=GPIO5)
 
   // Optional set protocol (default is 1, will work for most outlets)
   mySwitch.setProtocol(1);
 
   // Optional set pulse length.
-  mySwitch.setPulseLength(315);           // good for my switch
+  mySwitch.setPulseLength(315);           // good for the sockets I am using
 
   // Optional set number of transmission repetitions.
   //mySwitch.setRepeatTransmit(15);
