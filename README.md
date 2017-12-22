@@ -15,9 +15,8 @@ Flash the esp8266_alexa_rc.ino to your NodeMCU V2, connect your NodeMCU to your 
 * RC Sockets
 
 ## Wiring
-![NodeMCU wiring](https://raw.githubusercontent.com/wiki/Floenzens/esp8266_alexa_rc/nodemcu_rc_alexa_wiring.jpg)
-![344 mhz module](https://raw.githubusercontent.com/wiki/Floenzens/esp8266_alexa_rc/nodemcu_rc_alexa_433_module.jpg)
-
+![NodeMCU wiring](https://user-images.githubusercontent.com/1045651/34310934-91862f56-e75a-11e7-9a65-d8287ce97840.jpg)
+![344 mhz module](https://user-images.githubusercontent.com/1045651/34310933-916863cc-e75a-11e7-8296-e150f3cb3199.jpg)
 
 ## Used libraries
 * FauxmoESP https://bitbucket.org/xoseperez/fauxmoesp.git
