@@ -1,20 +1,20 @@
-#include <ESP8266WiFi.h>          //https://github.com/esp8266/Arduino
+#include <ESP8266WiFi.h>                //https://github.com/esp8266/Arduino
 
 //needed for library
 #include <DNSServer.h>
 #include <ESP8266WebServer.h>
-#include <WiFiManager.h>          //https://github.com/tzapu/WiFiManager
+#include <WiFiManager.h>                //https://github.com/tzapu/WiFiManager
 
-#include <RCSwitch.h>                                         // Send commands to RCSwitch
-#include "fauxmoESP.h"                                        // https://bitbucket.org/xoseperez/fauxmoesp Alexa Support for ESP8266
+#include <RCSwitch.h>                   // Send commands to RCSwitch
+#include "fauxmoESP.h"                  // https://bitbucket.org/xoseperez/fauxmoesp Alexa Support for ESP8266
 
 
 //for LED status
 #include <Ticker.h>
 Ticker ticker;
 
-fauxmoESP alexawifi;                                          // alexa Support by fauxmoESP
-RCSwitch mySwitch = RCSwitch();                               // initialise RC Support
+fauxmoESP alexawifi;                    // alexa Support by fauxmoESP
+RCSwitch mySwitch = RCSwitch();         // initialise RC Support
 
 //+=============================================================================
 // Toggle state
@@ -22,8 +22,8 @@ RCSwitch mySwitch = RCSwitch();                               // initialise RC S
 void tick()
 {
   //toggle state
-  int state = digitalRead(BUILTIN_LED);  // get the current state of GPIO1 pin
-  digitalWrite(BUILTIN_LED, !state);     // set pin to the opposite state
+  int state = digitalRead(BUILTIN_LED); // get the current state of GPIO1 pin
+  digitalWrite(BUILTIN_LED, !state);    // set pin to the opposite state
 }
 
 //+=============================================================================
@@ -32,8 +32,8 @@ void tick()
 void disableLed()
 {
   Serial.println("Turning off the LED to save power.");
-  digitalWrite(BUILTIN_LED, HIGH);                           // Shut down the LED
-  ticker.detach();                                      // Stopping the ticker
+  digitalWrite(BUILTIN_LED, HIGH);      // Shut down the LED
+  ticker.detach();                      // Stopping the ticker
 }
 
 //+=============================================================================
@@ -62,21 +62,21 @@ void lostWifiCallback (const WiFiEventStationModeDisconnected& evt) {
 // Send RC commands to devices
 //
 void requestRcSwitch(uint8_t device_id, const char * device_name, bool state) {
-  Serial.print("Gerät: "); Serial.println(device_name); 
+  Serial.print("Gerät: "); Serial.println(device_name);
   Serial.print("Status: ");
-  
+
   if (state) {
 
     if(device_id == 0) {
     Serial.println("AN");
-    
+
 //    mySwitch.send(12152610, 24);
     // Sending RC command to more than one device
     mySwitch.switchOn("11111", "10000"); // Schalter A
     delay(50);
-    mySwitch.switchOn("11111", "01000"); // Schalter B 
+    mySwitch.switchOn("11111", "01000"); // Schalter B
     delay(50);
-    mySwitch.switchOn("11111", "00100"); // Schalter C 
+    mySwitch.switchOn("11111", "00100"); // Schalter C
     delay(50);
     mySwitch.switchOn("11111", "00010"); // Schalter D
     delay(50);
@@ -85,19 +85,19 @@ void requestRcSwitch(uint8_t device_id, const char * device_name, bool state) {
 
   //  if(device_id == 1) {
   //  Serial.println("AN");
-    
+
   //  mySwitch.switchOn("11111", "00001");
   //  delay(50);
   //  }
- 
-  } 
-  
+
+  }
+
   else {
-    
+
     if(device_id == 0) {
     Serial.println("AUS");
-    
-    //mySwitch.send(11855607, 24); 
+
+    //mySwitch.send(11855607, 24);
     mySwitch.switchOff("11111", "10000"); // Schalter A
     delay(50);
     mySwitch.switchOff("11111", "01000"); // Schalter B
@@ -110,7 +110,7 @@ void requestRcSwitch(uint8_t device_id, const char * device_name, bool state) {
 
 //    if(device_id == 1) {
 //    Serial.println("OFF");
-    
+
 //    mySwitch.switchOff("11111", "00001");
 //    delay(50);
 //    }
@@ -151,10 +151,10 @@ void setup() {
     ESP.reset();
     delay(1000);
   }
-  
+
   // Reset device if lost wifi Connection
   WiFi.onStationModeDisconnected(&lostWifiCallback);
-  
+
   //if you get here you have connected to the WiFi
   Serial.println("connected...yeey :)");
   Serial.print("Local IP: ");
@@ -164,20 +164,20 @@ void setup() {
   digitalWrite(BUILTIN_LED, LOW);
 
   // below RC specific
-    
+
   mySwitch.enableTransmit(5);  //D1 am NodeMCU
-    
+
   // Optional set protocol (default is 1, will work for most outlets)
   mySwitch.setProtocol(1);
 
   // Optional set pulse length.
   mySwitch.setPulseLength(315);           // good for my switch
-  
+
   // Optional set number of transmission repetitions.
   //mySwitch.setRepeatTransmit(15);
 
 // Add some devices
-  alexawifi.addDevice("Licht"); //ID 0    
+  alexawifi.addDevice("Licht"); //ID 0
   alexawifi.onMessage(requestRcSwitch);
 
   ticker.attach(0.5, disableLed);
