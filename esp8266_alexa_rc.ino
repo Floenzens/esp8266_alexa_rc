@@ -27,14 +27,11 @@ RCSwitch mySwitch = RCSwitch();         // initialise RC Support
 
 #define SERIAL_BAUDRATE     115200
 
-#define ID_LIGHT            "Bettdecke"
-//#define ID_GREEN            "green lamp"
-
-
-// -----------------------------------------------------------------------------
-
-
-
+#define ID_SOCKET_A           "Schalter A"
+#define ID_SOCKET_B           "Schalter B"
+#define ID_SOCKET_C           "Schalter C"
+#define ID_SOCKET_D           "Schalter D"
+#define ID_SOCKET_ALL         "Licht"
 
 
 
@@ -71,44 +68,66 @@ void disableLed() {
 //
 
 void requestRcSwitch(uint8_t device_id, const char * device_name, bool state) {
-  Serial.print("Device: "); Serial.println(device_name);
-  Serial.print("Status: ");
+    Serial.print("Device: "); Serial.println(device_name);
+    Serial.print("Status: ");
+  
+    if (state) {
+    
+        Serial.println("ON");
+    
+        if(device_id == 0) {            
+            mySwitch.switchOn("11111", "10000"); // Socket A
+        } else if (device_id == 1) {
+            mySwitch.switchOn("11111", "01000"); // Socket B
+        } else if (device_id == 2) {
+            mySwitch.switchOn("11111", "00100"); // Socket C
+        } else if (device_id == 3) {
+            mySwitch.switchOn("11111", "00010"); // Socket D  
 
-  if (state) {
+        // Sending RC command to more than one device at once
+        } else if (device_id == 4) {
+            mySwitch.switchOn("11111", "10000"); // Socket A
+            delay(50);
+            mySwitch.switchOn("11111", "01000"); // Socket B
+            delay(50);
+            mySwitch.switchOn("11111", "00100"); // Socket C
+            delay(50);
+            mySwitch.switchOn("11111", "00010"); // Socket D  
+            delay(50);                
+        }
+    
+    } else {
+    
+        Serial.println("OFF");
 
-    if(device_id == 0) {
-    Serial.println("ON");
+        if(device_id == 0) {            
+            mySwitch.switchOff("11111", "10000"); // Socket A
+        } else if (device_id == 1) {
+            mySwitch.switchOff("11111", "01000"); // Socket B
+        } else if (device_id == 2) {
+            mySwitch.switchOff("11111", "00100"); // Socket C
+        } else if (device_id == 3) {
+            mySwitch.switchOff("11111", "00010"); // Socket D
+            
+        // Sending RC command to more than one device at once
+        } else if (device_id == 4) {
+            mySwitch.switchOff("11111", "10000"); // Socket A
+            delay(50);
+            mySwitch.switchOff("11111", "01000"); // Socket B
+            delay(50);
+            mySwitch.switchOff("11111", "00100"); // Socket C
+            delay(50);
+            mySwitch.switchOff("11111", "00010"); // Socket D  
+            delay(50);                
+        }
 
-    // Sending RC command to more than one device at once
-    mySwitch.switchOn("11111", "10000"); // Socket A
-    delay(50);
-    mySwitch.switchOn("11111", "01000"); // Socket B
-    delay(50);
-    mySwitch.switchOn("11111", "00100"); // Socket C
-    delay(50);
-    mySwitch.switchOn("11111", "00010"); // Socket D
-    delay(50);
+        
     }
-  }
 
-  else {
-
-    if(device_id == 0) {
-    Serial.println("OFF");
-
-    mySwitch.switchOff("11111", "10000"); // Socket A
     delay(50);
-    mySwitch.switchOff("11111", "01000"); // Socket B
-    delay(50);
-    mySwitch.switchOff("11111", "00100"); // Socket C
-    delay(50);
-    mySwitch.switchOff("11111", "00010"); // Socket D
-    delay(50);
-    }
 
- // ticker.attach(0.5, disableLed);
-  }
-
+   // ticker.attach(0.5, disableLed);
+    
 }
 
 
@@ -139,19 +158,6 @@ void wifiSetup() {
 
 
 //+=============================================================================
-// Gets called when WiFiManager enters configuration mode
-//
-
-//void configModeCallback (WiFiManager *myWiFiManager) {
-//    Serial.println("Entered config mode");
-//    Serial.println(WiFi.softAPIP()); 
-//    //if you used auto generated SSID, print it
-//    Serial.println(myWiFiManager->getConfigPortalSSID());
-//    //entered config mode, make led toggle faster
-////    ticker.attach(0.2, tick);
-//}
-
-//+=============================================================================
 // Gets called when device loses connection to the accesspoint
 //
 
@@ -170,80 +176,57 @@ void lostWifiCallback (const WiFiEventStationModeDisconnected& evt) {
 //
 void setup() {
 
-  Serial.begin(SERIAL_BAUDRATE);
-  Serial.println();
-  Serial.println("ESP8266 IR Controller");
+    Serial.begin(SERIAL_BAUDRATE);
+    Serial.println();
+    Serial.println("ESP8266 IR Controller");
+    
+    //set led pin as output
+    pinMode(LED_BUILTIN, OUTPUT);
+    
+    // start ticker with 0.5 because we start in AP mode and try to connect
+    ticker.attach(0.6, tick);
   
-  //set led pin as output
-  pinMode(LED_BUILTIN, OUTPUT);
-  
-  // start ticker with 0.5 because we start in AP mode and try to connect
-  ticker.attach(0.6, tick);
-
-  
-  //keep LED on
-  digitalWrite(LED_BUILTIN, LOW);
+    
+    //keep LED on
+    digitalWrite(LED_BUILTIN, LOW);
 
 
     wifiSetup();
 
-
-//    // WiFiManager
-//    // Local intialization. Once its business is done, there is no need to keep it around
-//    WiFiManager wifiManager;
-//    
-//    //reset settings - for testing
-//    //wifiManager.resetSettings();
-//  
-//    //set callback that gets called when connecting to previous WiFi fails, and enters Access Point mode
-//    wifiManager.setAPCallback(configModeCallback);
-//  
-//    //fetches ssid and pass and tries to connect
-//    //if it does not connect it starts an access point with the specified name
-//    //here  "AutoConnectAP"
-//    //and goes into a blocking loop awaiting configuration
-//    
-//    if (!wifiManager.autoConnect()) {
-//      
-//        Serial.println("failed to connect and hit timeout");
-//        //reset and try again, or maybe put it to deep sleep
-//        ESP.reset();
-//        delay(1000);
-//    
-//    }
-//  
+ 
     // Reset device if lost wifi Connection
     WiFi.onStationModeDisconnected(&lostWifiCallback);
   
-//    //if you get here you have connected to the WiFi
-//    Serial.println("connected to WiFi");
-//    Serial.print("Local IP: ");
-//    Serial.println(WiFi.localIP().toString());
-//  
-  ticker.detach();
+    ticker.detach();
 
     
-  // below RC specific
-  mySwitch.enableTransmit(5);  //D1 on NodeMCU (=GPIO5)
+    // below RC specific
+    mySwitch.enableTransmit(5);  //D1 on NodeMCU (=GPIO5)
 
-  // Optional set protocol (default is 1, will work for most outlets)
-  mySwitch.setProtocol(1);
+    // Optional set protocol (default is 1, will work for most outlets)
+    mySwitch.setProtocol(1);
 
-  // Optional set pulse length.
-  mySwitch.setPulseLength(315);           // good for the sockets I am using
+    // Optional set pulse length.
+    mySwitch.setPulseLength(315);           // good for the sockets I am using
+  
+    // Optional set number of transmission repetitions.
+    //mySwitch.setRepeatTransmit(15);
 
-  // Optional set number of transmission repetitions.
-  //mySwitch.setRepeatTransmit(15);
+    // Add some devices
+    fauxmo.createServer(true); // set to false, if you want to use an external webserver instead of fauxmo build in one
+    fauxmo.addDevice(ID_SOCKET_A); 
+    fauxmo.addDevice(ID_SOCKET_B); 
+    fauxmo.addDevice(ID_SOCKET_C); 
+    fauxmo.addDevice(ID_SOCKET_D);
+    fauxmo.addDevice(ID_SOCKET_ALL); 
+    
+  
+    fauxmo.setPort(80); // required for gen3 devices
+    fauxmo.enable(true);
+    // fauxmo.onMessage(requestRcSwitch);
 
-// Add some devices
-  fauxmo.createServer(true); // set to false, if you want to use an external webserver instead of fauxmo build in one
-  fauxmo.addDevice(ID_LIGHT); // 
-  fauxmo.setPort(80); // required for gen3 devices
-  fauxmo.enable(true);
-  // fauxmo.onMessage(requestRcSwitch);
 
-
-  fauxmo.onSetState([](unsigned char device_id, const char * device_name, bool state, unsigned char value) {
+    fauxmo.onSetState([](unsigned char device_id, const char * device_name, bool state, unsigned char value) {
         
         // Callback when a command from Alexa is received. 
         // You can use device_id or device_name to choose the element to perform an action onto (relay, LED,...)
@@ -256,27 +239,21 @@ void setup() {
         // Checking for device_id is simpler if you are certain about the order they are loaded and it does not change.
         // Otherwise comparing the device_name is safer.
 
-        if (strcmp(device_name, ID_LIGHT)==0) {
-           requestRcSwitch(0, ID_LIGHT, state);
+        if (strcmp(device_name, ID_SOCKET_A)==0) {
+            requestRcSwitch(0, ID_SOCKET_A, state);
+        } else if (strcmp(device_name, ID_SOCKET_B)==0) {
+            requestRcSwitch(1, ID_SOCKET_B, state);
+        } else if (strcmp(device_name, ID_SOCKET_C)==0) {
+            requestRcSwitch(2, ID_SOCKET_C, state);
+        } else if (strcmp(device_name, ID_SOCKET_D)==0) {
+            requestRcSwitch(3, ID_SOCKET_D, state);
+        } else if (strcmp(device_name, ID_SOCKET_ALL)==0) {
+            requestRcSwitch(4, ID_SOCKET_ALL, state);
         }
-//        if (strcmp(device_name, ID_LIGHT)==0) {
-//            digitalWrite(LED_YELLOW, state ? HIGH : LOW);
-//        } else if (strcmp(device_name, ID_GREEN)==0) {
-//            digitalWrite(LED_GREEN, state ? HIGH : LOW);
-//        } else if (strcmp(device_name, ID_BLUE)==0) {
-//            digitalWrite(LED_BLUE, state ? HIGH : LOW);
-//        } else if (strcmp(device_name, ID_PINK)==0) {
-//            digitalWrite(LED_PINK, state ? HIGH : LOW);
-//        } else if (strcmp(device_name, ID_WHITE)==0) {
-//            digitalWrite(LED_WHITE, state ? HIGH : LOW);
-//        }
 
-  });
+    });
 
-
-
-
-  ticker.attach(0.5, disableLed);
+    ticker.attach(0.5, disableLed);
 
 }
 
