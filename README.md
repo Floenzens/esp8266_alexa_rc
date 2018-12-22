@@ -1,7 +1,7 @@
 # esp8266_alexa_rc
 Sending RC Commands with Alexa
 
-Purpose of this project is to send voice controlled RC commands using different existing libraries, Amazon Echo and NodeMCU V2 (Amica)
+Purpose of this project is to send voice controlled RC commands to RC controlled power sockets using different existing libraries, Amazon Echo and NodeMCU V2 (Amica)
 
 ## How it works
 Flash the esp8266_alexa_rc.ino to your NodeMCU V2, connect your NodeMCU to your wifi using the WifiManager, discover new devices with your Alexa device and say "Alexa, Licht an" (or whatever you changed the command to).
