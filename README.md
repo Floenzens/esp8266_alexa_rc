@@ -4,7 +4,7 @@ Sending RC Commands with Alexa
 Purpose of this project is to send voice controlled RC commands to RC controlled power sockets using different existing libraries, Amazon Echo and NodeMCU V2 (Amica)
 
 ## How it works
-Flash the esp8266_alexa_rc.ino to your NodeMCU V2, connect your NodeMCU to your wifi using the WifiManager, discover new devices with your Alexa device and say "Alexa, Licht an" (or whatever you changed the command to).
+Flash the esp8266_alexa_rc.ino to your NodeMCU V2, connect your NodeMCU to your WiFi, discover new devices with your Alexa device and say "Alexa, Licht an" (or whatever you changed the command to).
 
 
 ## What you need
@@ -25,10 +25,7 @@ Flash the esp8266_alexa_rc.ino to your NodeMCU V2, connect your NodeMCU to your 
 ## Set up everything
 * change `alexawifi.addDevice("Licht"); //ID 0` to the desired Alexa command. Here I am using the german word `Licht`
 * flash esp8266_alexa_rc.ino to NodeMCU (using Arduino IDE)
-* configure `WifiManager` (see https://github.com/tzapu/WiFiManager for details)
-  * connect to the wifi, your esp8266/NodeMCU newly established
-  * provide your wifi credentials (will be stored in NodeMCUs filesystem)
-  * connect to your "normal" wifi
+* configure your WiFi SSID and password in file credentials.h 
 * request Alexa to find new devices (e.g. by using the Alexa App)
 * say "Alexa, Licht an" (if you use a german configured Alexa. Otherwise probably "Alexa, light on" or something comparable)
 * have fun, switching your sockets on and off
